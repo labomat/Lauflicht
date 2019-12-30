@@ -52,26 +52,18 @@ void loop() {
       //Serial.println(i);
       if (i == 0) {                         // first led 
           SoftPWMSet(leds[i], FULL);
-          SoftPWMSet(leds[i+1], DIM);
-          SoftPWMSet(leds[MAX_LED-1], DIM);
           SoftPWMSet(leds[MAX_LED-2], 0);
       }
       else if (i == 1) {                    // second led
           SoftPWMSet(leds[i], FULL);
-          SoftPWMSet(leds[i+1], DIM);
-          SoftPWMSet(leds[i-1], DIM);
           SoftPWMSet(leds[MAX_LED-1], 0);
       }
       else if (i == MAX_LED-1) {            // last -1 led before turn is complete
           SoftPWMSet(leds[i], FULL);
-          SoftPWMSet(leds[0], DIM);
-          SoftPWMSet(leds[i-1], DIM);
           SoftPWMSet(leds[i-2], 0);
        }
       else {
-        SoftPWMSet(leds[i+1], DIM);
         SoftPWMSet(leds[i], FULL);
-        SoftPWMSet(leds[i-1], DIM);
         SoftPWMSet(leds[i-2], 0);
       }
       delay(zeit);
