@@ -1,5 +1,5 @@
 //
-// Rundumlicht v0.4
+// Rundumlicht v0.5
 // Autor: Kai Laborenz
 //
 // blue chase light simulation with leds  
@@ -9,27 +9,42 @@
 // is stored on eeprom
 //
 
-#include <SoftPWM.h>
-#include <EEPROM.h>
+#include <SoftPWM.h>      // needed for light fading on all ports
+#include <EEPROM.h>       // needed to save the speed settings on eeprom
 
+// pins for leds
 const byte MAX_LED = 8;
+uint8_t leds[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+
+// pin for speed setting button
+#define SPEEEDPIN 12
+
 int umlaufzeit = 800;     // time for one "turn" oft the light
 const int MAXZEIT = 300;  // maximum delay = slowest speed
 const int MINZEIT = 20;   // minimum delay = maximum speed
-const int FULL = 255;     // pwm value for maximum brightness of led
-const int DIM = 3;        // pwm value for dimmed led
 int zeit = umlaufzeit / MAX_LED;
 int dir = -1;
 
+const int FULL = 255;     // pwm value for maximum brightness of led
+const int DIM = 3;        // pwm value for dimmed led
 
-uint8_t leds[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+
+//#define DEB_ON            // remove comment to debug
+
+#ifdef DEB_ON
+  #define DEBUG_PRINT(str)  Serial.print(str)
+  #define DEBUG_PRINTLN(str)  Serial.println(str)
+#else
+  #define DEBUG_PRINT(str)
+  #define DEBUG_PRINTLN(str)
+#endif
 
 void setup() {
   
   Serial.begin(9600);
   SoftPWMBegin();
 
-  pinMode(12, INPUT_PULLUP);
+  pinMode(SPEEEDPIN, INPUT_PULLUP);
   
   for (int i = 0; i < MAX_LED; i++) {
     pinMode(i+2, OUTPUT);
@@ -41,10 +56,10 @@ void setup() {
   SoftPWMSetFadeTime(ALL, 300, 300);
 
   zeit = EEPROM.read(0);
-  Serial.println(zeit);
+
+  DEBUG_PRINTLN(zeit);
   
 }
-
 
 void loop() {
 
@@ -67,10 +82,11 @@ void loop() {
         SoftPWMSet(leds[i-2], 0);
       }
       delay(zeit);
+      
       // press button to change speed
       // and update result on eeprom
-      if(!digitalRead(12)) {
-        Serial.println(zeit);
+      if(!digitalRead(SPEEEDPIN)) {
+        DEBUG_PRINTLN(zeit);
         zeit = zeit + (5*dir);
         if (zeit < MINZEIT) dir = 1;
         if (zeit > MAXZEIT) dir = -1;
